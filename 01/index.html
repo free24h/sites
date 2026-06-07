@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player YouTube</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#111;
+    color:white;
+    font-family:Arial,sans-serif;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+.topo{
+    padding:10px;
+    background:#222;
+    display:flex;
+    gap:10px;
+}
+
+input{
+    flex:1;
+    padding:10px;
+    border:none;
+    border-radius:5px;
+    font-size:16px;
+}
+
+button{
+    padding:10px 20px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+#player{
+    flex:1;
+    width:100%;
+    border:none;
+}
+</style>
+</head>
+<body>
+
+<div class="topo">
+    <input
+        type="text"
+        id="url"
+        placeholder="Cole a URL do YouTube aqui">
+    <button onclick="carregarVideo()">
+        Carregar Vídeo
+    </button>
+</div>
+
+<iframe
+    id="player"
+    allow="autoplay; fullscreen"
+    allowfullscreen>
+</iframe>
+
+<script>
+function extrairVideoID(url) {
+
+    let regex =
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?/]+)/;
+
+    let match = url.match(regex);
+
+    return match ? match[1] : null;
+}
+
+function carregarVideo() {
+
+    let url = document.getElementById("url").value.trim();
+
+    let videoId = extrairVideoID(url);
+
+    if (!videoId) {
+        alert("URL inválida!");
+        return;
+    }
+
+    document.getElementById("player").src =
+        `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&rel=0`;
+}
+</script>
+
+</body>
+</html>

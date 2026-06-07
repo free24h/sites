@@ -1,252 +1,49 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reprodutor de Vídeo YouTube</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vídeo YouTube</title>
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        h1 {
-            margin-bottom: 30px;
-            font-size: 1.8rem;
-            text-align: center;
-        }
+    body {
+        background: #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+    }
 
-        .input-container {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-            max-width: 960px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
+    .video-container {
+        width: 100%;
+        height: 100%;
+    }
 
-        input[type="text"] {
-            flex: 1;
-            min-width: 250px;
-            padding: 12px 16px;
-            font-size: 1rem;
-            border: 2px solid #333;
-            border-radius: 8px;
-            background-color: #1e1e1e;
-            color: #fff;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        input[type="text"]:focus {
-            border-color: #ff0000;
-        }
-
-        input[type="text"]::placeholder {
-            color: #666;
-        }
-
-        button {
-            padding: 12px 24px;
-            font-size: 1rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            background-color: #ff0000;
-            color: #fff;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #cc0000;
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        .video-container {
-            position: relative;
-            width: 100%;
-            max-width: 960px;
-            aspect-ratio: 16 / 9;
-            background: #000;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-        }
-
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
-
-        .placeholder {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            color: #666;
-            font-size: 1.2rem;
-        }
-
-        .placeholder::before {
-            content: "🎬";
-            display: block;
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
-
-        footer {
-            margin-top: 30px;
-            font-size: 0.9rem;
-            color: #888;
-            text-align: center;
-        }
-
-        .error-message {
-            color: #ff4444;
-            margin-top: 10px;
-            font-size: 0.9rem;
-            display: none;
-        }
-
-        @media (max-width: 600px) {
-            .input-container {
-                flex-direction: column;
-            }
-            
-            input[type="text"] {
-                min-width: 100%;
-            }
-        }
-    </style>
+    iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+</style>
 </head>
 <body>
-    <h1>🎬 Reprodutor de Vídeo YouTube</h1>
 
-    <div class="input-container">
-        <input 
-            type="text" 
-            id="videoUrl" 
-            placeholder="Cole a URL do YouTube aqui (ex: https://youtube.com/watch?v=...)"
-        >
-        <button onclick="loadVideo()">Carregar Vídeo</button>
-    </div>
+<div class="video-container">
+    <iframe
+        src="https://www.youtube.com/embed/F6J9rsSGAI4?autoplay=1&rel=0&modestbranding=1"
+        title="YouTube video player"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen>
+    </iframe>
+</div>
 
-    <div class="error-message" id="errorMessage"></div>
-
-    <div class="video-container" id="videoContainer">
-        <div class="placeholder" id="placeholder">
-            Cole uma URL do YouTube e clique em "Carregar Vídeo"
-        </div>
-    </div>
-
-    <footer>O vídeo inicia automaticamente (mudo) • Suporta múltiplos formatos de URL</footer>
-
-    <script>
-        function extractVideoId(url) {
-            // Remove espaços em branco
-            url = url.trim();
-            
-            // Padrões para diferentes formatos de URL do YouTube
-            const patterns = [
-                /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
-                /youtube\.com\/shorts\/([^&\n?#]+)/
-            ];
-            
-            for (const pattern of patterns) {
-                const match = url.match(pattern);
-                if (match && match[1]) {
-                    return match[1];
-                }
-            }
-            
-            // Se não encontrou padrão, verifica se já é apenas o ID
-            if (/^[a-zA-Z0-9_-]{11}$/.test(url)) {
-                return url;
-            }
-            
-            return null;
-        }
-
-        function loadVideo() {
-            const urlInput = document.getElementById('videoUrl');
-            const errorMessage = document.getElementById('errorMessage');
-            const videoContainer = document.getElementById('videoContainer');
-            const placeholder = document.getElementById('placeholder');
-            
-            const url = urlInput.value;
-            
-            if (!url) {
-                showError('Por favor, insira uma URL do YouTube');
-                return;
-            }
-            
-            const videoId = extractVideoId(url);
-            
-            if (!videoId) {
-                showError('URL inválida. Use um link do YouTube válido.');
-                return;
-            }
-            
-            // Esconde mensagem de erro e placeholder
-            errorMessage.style.display = 'none';
-            if (placeholder) {
-                placeholder.style.display = 'none';
-            }
-            
-            // Remove iframe anterior se existir
-            const existingIframe = videoContainer.querySelector('iframe');
-            if (existingIframe) {
-                existingIframe.remove();
-            }
-            
-            // Cria novo iframe com autoplay e mute
-            const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&rel=0&modestbranding=1`;
-            iframe.title = 'YouTube video player';
-            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-            iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-            iframe.allowFullscreen = true;
-            
-            videoContainer.appendChild(iframe);
-            
-            // Limpa o campo de input
-            urlInput.value = '';
-        }
-
-        function showError(message) {
-            const errorMessage = document.getElementById('errorMessage');
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-        }
-
-        // Permite carregar vídeo ao pressionar Enter
-        document.getElementById('videoUrl').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                loadVideo();
-            }
-        });
-    </script>
 </body>
 </html>
